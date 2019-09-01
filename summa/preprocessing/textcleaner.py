@@ -6,6 +6,7 @@ logger = logging.getLogger('summa.preprocessing.cleaner')
 
 try:
     from pattern.en import tag
+
     logger.info("'pattern' package found; tag filters are available for English")
     HAS_PATTERN = True
 except ImportError:
@@ -17,7 +18,6 @@ import re
 from .snowball import SnowballStemmer
 from .stopwords import get_stopwords_by_language
 from summa.syntactic_unit import SyntacticUnit
-
 
 # Utility functions adapted from Gensim v0.10.0:
 # https://github.com/RaRe-Technologies/gensim/blob/0.10.0/gensim/utils.py
@@ -48,7 +48,7 @@ def set_stopwords_by_language(language, additional_stopwords):
     words = get_stopwords_by_language(language)
     if not additional_stopwords:
         additional_stopwords = {}
-    STOPWORDS = frozenset({ w for w in words.split() if w } | { w for w in additional_stopwords if w })
+    STOPWORDS = frozenset({w for w in words.split() if w} | {w for w in additional_stopwords if w})
 
 
 def init_textcleanner(language, additional_stopwords):
@@ -56,9 +56,9 @@ def init_textcleanner(language, additional_stopwords):
     set_stopwords_by_language(language, additional_stopwords)
 
 
-def split_sentences(text):
+def split_sentences(text, text_as_list=False):
     processed = replace_abbreviations(text)
-    return [undo_replacement(sentence) for sentence in get_sentences(processed)]
+    return [undo_replacement(sentence) for sentence in get_sentences(processed, text_as_list)]
 
 
 def replace_abbreviations(text):
@@ -77,19 +77,25 @@ def replace_with_separator(text, separator, regexs):
     return result
 
 
-def get_sentences(text):
+def get_sentences(text, text_as_list=False):
+    if text_as_list:
+        return text
     for match in RE_SENTENCE.finditer(text):
         yield match.group()
 
 
 # Taken from Gensim
 RE_PUNCT = re.compile('([%s])+' % re.escape(string.punctuation), re.UNICODE)
+
+
 def strip_punctuation(s):
     return RE_PUNCT.sub(" ", s)
 
 
 # Taken from Gensim
 RE_NUMERIC = re.compile(r"[0-9]+", re.UNICODE)
+
+
 def strip_numeric(s):
     return RE_NUMERIC.sub("", s)
 
@@ -128,6 +134,8 @@ def deaccent(text):
 
 # Taken from Gensim
 PAT_ALPHABETIC = re.compile('(((?![\d])\w)+)', re.UNICODE)
+
+
 def tokenize(text, lowercase=False, deacc=False):
     """
     Iteratively yield tokens as unicode strings, optionally also lowercasing them
@@ -158,11 +166,11 @@ def merge_syntactic_units(original_units, filtered_units, tags=None):
     return units
 
 
-def clean_text_by_sentences(text, language="english", additional_stopwords=None):
+def clean_text_by_sentences(text, language="english", additional_stopwords=None, text_as_list=False):
     """ Tokenizes a given text into sentences, applying filters and lemmatizing them.
     Returns a SyntacticUnit list. """
     init_textcleanner(language, additional_stopwords)
-    original_sentences = split_sentences(text)
+    original_sentences = split_sentences(text, text_as_list)
     filtered_sentences = filter_words(original_sentences)
 
     return merge_syntactic_units(original_sentences, filtered_sentences)
@@ -180,7 +188,7 @@ def clean_text_by_word(text, language="english", deacc=False, additional_stopwor
     else:
         tags = None
     units = merge_syntactic_units(original_words, filtered_words, tags)
-    return { unit.text : unit for unit in units }
+    return {unit.text: unit for unit in units}
 
 
 def tokenize_by_word(text, deacc=False):

@@ -109,12 +109,13 @@ def _extract_most_important_sentences(sentences, ratio, words):
         return _get_sentences_with_word_count(sentences, words)
 
 
-def summarize(text, ratio=0.2, words=None, language="english", split=False, scores=False, additional_stopwords=None):
-    if not isinstance(text, str):
+def summarize(text, ratio=0.2, words=None, language="english", split=False, scores=False, additional_stopwords=None,
+              text_as_list=False):
+    if not isinstance(text, str) and not (isinstance(text, list) and text_as_list is True):
         raise ValueError("Text parameter must be a Unicode object (str)!")
 
     # Gets a list of processed sentences.
-    sentences = _clean_text_by_sentences(text, language, additional_stopwords)
+    sentences = _clean_text_by_sentences(text, language, additional_stopwords, text_as_list)
 
     # Creates the graph and calculates the similarity coefficient for every pair of nodes.
     graph = _build_graph([sentence.token for sentence in sentences])

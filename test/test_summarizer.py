@@ -21,7 +21,7 @@ class TestSummarizer(unittest.TestCase):
         text = get_text_from_test_data("mihalcea_tarau.txt")
         additional_stoplist = get_text_from_test_data("mihalcea_tarau.sw.txt").strip().split(",")
         # Makes a summary of the text.
-        generated_summary = summarize(text,additional_stopwords=additional_stoplist)
+        generated_summary = summarize(text, additional_stopwords=additional_stoplist)
 
         # To be compared to the method reference.
         summary = get_text_from_test_data("mihalcea_tarau.summ.txt")
@@ -63,12 +63,12 @@ class TestSummarizer(unittest.TestCase):
 
     def test_few_distinct_words_summarization_wstopwords_is_empty_string(self):
         text = get_text_from_test_data("few_distinct_words.txt")
-        additional_stoplist = ["here","there"]
+        additional_stoplist = ["here", "there"]
         self.assertEqual(summarize(text, additional_stopwords=additional_stoplist), "")
 
     def test_few_distinct_words_summarization_wstopwords_with_split_is_empty_list(self):
         text = get_text_from_test_data("few_distinct_words.txt")
-        additional_stoplist = ["here","there"]
+        additional_stoplist = ["here", "there"]
         self.assertEqual(summarize(text, split=True, additional_stopwords=additional_stoplist), [])
 
     def test_summary_from_unrelated_sentences_is_not_empty_string(self):
@@ -142,6 +142,11 @@ class TestSummarizer(unittest.TestCase):
         text = get_text_from_test_data("polish.txt")
         self.assertIsNotNone(summarize(text, language="polish"))
 
+    def test_german(self):
+        # Test the summarization module for German language.
+        text = get_text_from_test_data("german.txt")
+        self.assertIsNotNone(summarize(text, language="german"))
+
     def test_text_as_bytes_raises_exception(self):
         # Test the keyword extraction for a text that is not a unicode object
         # (Python 3 str).
@@ -149,9 +154,9 @@ class TestSummarizer(unittest.TestCase):
         bytes = text.encode(encoding="utf-8")
         with self.assertRaises(ValueError):
             summarize(bytes, language="spanish")
-    
+
     def test_arabic(self):
-         # Test the summarization module for arabic language.
+        # Test the summarization module for arabic language.
         text = get_text_from_test_data("arabic.txt")
         self.assertIsNotNone(summarize(text, language='arabic'))
 
