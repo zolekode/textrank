@@ -57,8 +57,10 @@ def init_textcleanner(language, additional_stopwords):
 
 
 def split_sentences(text, text_as_list=False):
+    if text_as_list:
+        return text
     processed = replace_abbreviations(text)
-    return [undo_replacement(sentence) for sentence in get_sentences(processed, text_as_list)]
+    return [undo_replacement(sentence) for sentence in get_sentences(processed)]
 
 
 def replace_abbreviations(text):
@@ -77,9 +79,7 @@ def replace_with_separator(text, separator, regexs):
     return result
 
 
-def get_sentences(text, text_as_list=False):
-    if text_as_list:
-        return text
+def get_sentences(text):
     for match in RE_SENTENCE.finditer(text):
         yield match.group()
 

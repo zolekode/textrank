@@ -147,6 +147,16 @@ class TestSummarizer(unittest.TestCase):
         text = get_text_from_test_data("german.txt")
         self.assertIsNotNone(summarize(text, language="german"))
 
+    def test_german_text_as_list(self):
+        text = get_text_from_test_data("german.txt")
+        sentences = text.split("\n")
+        # sentences were carefully crafted so to obtain the same list of sentences in both test cases
+        summary_from_text = summarize(text, language="german", text_as_list=False)
+        summary_from_sentences = summarize(sentences, language="german", text_as_list=True)
+        self.assertIsNotNone(summary_from_text)
+        self.assertIsNotNone(summary_from_sentences)
+        self.assertEqual(summary_from_text, summary_from_sentences)
+
     def test_text_as_bytes_raises_exception(self):
         # Test the keyword extraction for a text that is not a unicode object
         # (Python 3 str).
